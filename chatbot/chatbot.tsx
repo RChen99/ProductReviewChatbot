@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
+import './chatbot.css';
 
 // Chatbot Dialog Component
 interface ChatbotDialogProps {
@@ -27,7 +28,7 @@ function ChatbotDialog({
       {/* Header */}
       <div className="bg-gray-800 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div>
-          <h3 className="font-semibold">Chat Support</h3>
+          <h3 className="font-semibold">Product Support</h3>
           <p className="text-sm text-gray-300">Online</p>
         </div>
         <button 
@@ -170,155 +171,22 @@ export function ChatbotStandalone() {
     }
   };
 
-  const styles = {
-    chatDialog: {
-      position: 'fixed' as const,
-      bottom: '128px',
-      right: '24px',
-      width: '400px',
-      height: '550px',
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-      display: 'flex',
-      flexDirection: 'column' as const,
-      zIndex: 50,
-      border: '1px solid #e5e7eb'
-    },
-    chatHeader: {
-      backgroundColor: '#232f3e',
-      color: 'white',
-      padding: '16px',
-      borderTopLeftRadius: '8px',
-      borderTopRightRadius: '8px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    headerTitle: {
-      fontWeight: 600,
-      margin: 0,
-      fontSize: '16px'
-    },
-    headerStatus: {
-      fontSize: '14px',
-      color: '#d1d5db',
-      margin: 0
-    },
-    closeButton: {
-      backgroundColor: 'transparent',
-      border: 'none',
-      color: 'white',
-      cursor: 'pointer',
-      padding: '4px',
-      borderRadius: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'background-color 0.2s'
-    },
-    messagesContainer: {
-      flex: 1,
-      overflowY: 'auto' as const,
-      padding: '16px',
-      display: 'flex',
-      flexDirection: 'column' as const,
-      gap: '16px'
-    },
-    messageWrapper: {
-      display: 'flex'
-    },
-    messageWrapperUser: {
-      justifyContent: 'flex-end'
-    },
-    messageWrapperBot: {
-      justifyContent: 'flex-start'
-    },
-    messageBubble: {
-      maxWidth: '75%',
-      padding: '12px',
-      borderRadius: '8px'
-    },
-    messageBubbleUser: {
-      backgroundColor: '#ff9900',
-      color: 'white'
-    },
-    messageBubbleBot: {
-      backgroundColor: '#f3f4f6',
-      color: '#111827'
-    },
-    inputContainer: {
-      padding: '16px',
-      borderTop: '1px solid #e5e7eb',
-      display: 'flex',
-      gap: '8px'
-    },
-    input: {
-      flex: 1,
-      padding: '8px 16px',
-      border: '1px solid #d1d5db',
-      borderRadius: '8px',
-      fontSize: '14px',
-      outline: 'none',
-      color: '#111827'
-    },
-    sendButton: {
-      backgroundColor: '#ff9900',
-      border: 'none',
-      color: 'white',
-      padding: '8px',
-      borderRadius: '8px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'background-color 0.2s'
-    },
-    chatButton: {
-      position: 'fixed' as const,
-      bottom: '24px',
-      right: '24px',
-      backgroundColor: '#ff9900',
-      border: 'none',
-      color: 'white',
-      padding: '20px',
-      borderRadius: '50%',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 50,
-      transition: 'background-color 0.2s'
-    }
-  };
-
   return (
     <>
       {isChatbotOpen && (
-        <div style={styles.chatDialog}>
+        <div className="chatbot-dialog">
           {/* Header */}
-          <div style={styles.chatHeader}>
+          <div className="chatbot-header">
             <div>
-              <h3 style={styles.headerTitle}>Chat Support</h3>
-              <p style={styles.headerStatus}>
-                <span style={{
-                  display: 'inline-block',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#10b981',
-                  marginRight: '6px',
-                  verticalAlign: 'middle'
-                }}></span>
+              <h3 className="chatbot-header-title">Product Support</h3>
+              <p className="chatbot-header-status">
+                <span className="chatbot-online-dot"></span>
                 Online
               </p>
             </div>
             <button 
               onClick={() => setIsChatbotOpen(false)}
-              style={styles.closeButton}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#374151'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              className="chatbot-close-button"
               aria-label="Close chatbot"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -329,20 +197,18 @@ export function ChatbotStandalone() {
           </div>
 
           {/* Messages */}
-          <div style={styles.messagesContainer}>
+          <div className="chatbot-messages-container">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                style={{
-                  ...styles.messageWrapper,
-                  ...(msg.sender === 'user' ? styles.messageWrapperUser : styles.messageWrapperBot)
-                }}
+                className={`chatbot-message-wrapper ${
+                  msg.sender === 'user' ? 'chatbot-message-wrapper-user' : 'chatbot-message-wrapper-bot'
+                }`}
               >
                 <div
-                  style={{
-                    ...styles.messageBubble,
-                    ...(msg.sender === 'user' ? styles.messageBubbleUser : styles.messageBubbleBot)
-                  }}
+                  className={`chatbot-message-bubble ${
+                    msg.sender === 'user' ? 'chatbot-message-bubble-user' : 'chatbot-message-bubble-bot'
+                  }`}
                 >
                   {msg.text}
                 </div>
@@ -351,22 +217,18 @@ export function ChatbotStandalone() {
           </div>
 
           {/* Input */}
-          <div style={styles.inputContainer}>
+          <div className="chatbot-input-container">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              onFocus={(e) => e.currentTarget.style.borderColor = '#ff9900'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
               placeholder="Type your message..."
-              style={styles.input}
+              className="chatbot-input"
             />
             <button
               onClick={handleSend}
-              style={styles.sendButton}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fa8900'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff9900'}
+              className="chatbot-send-button"
               aria-label="Send message"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -381,9 +243,7 @@ export function ChatbotStandalone() {
       {/* Chatbot Button */}
       <button 
         onClick={() => setIsChatbotOpen(!isChatbotOpen)}
-        style={styles.chatButton}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fa8900'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ff9900'}
+        className="chatbot-button"
         aria-label="Open chatbot"
       >
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
