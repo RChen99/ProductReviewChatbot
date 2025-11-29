@@ -95,7 +95,7 @@ export function Chatbot() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: 'Hi! Welcome to DS5110 Holiday Deals! How can I help you today?',
+      text: 'Hi DS5110! How can I help you today?',
       sender: 'bot'
     }
   ]);
@@ -143,7 +143,7 @@ export function ChatbotStandalone() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: 'Hi! Welcome to DS5110 Holiday Deals! How can I help you today?',
+      text: 'Hi DS5110! How can I help you today?',
       sender: 'bot'
     }
   ]);

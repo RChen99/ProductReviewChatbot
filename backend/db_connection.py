@@ -4,6 +4,12 @@ from typing import Optional
 import mysql.connector
 from mysql.connector import MySQLConnection, Error
 
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load backend/.env
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
 def get_db_connection(
     host: Optional[str] = None,
@@ -12,18 +18,6 @@ def get_db_connection(
     password: Optional[str] = None,
     database: Optional[str] = None,
 ) -> MySQLConnection:
-    """
-    Create and return a MySQL database connection.
-
-    By default this reads connection settings from environment variables:
-      - DB_HOST (default: 'localhost')
-      - DB_PORT (default: 3306)
-      - DB_USER (default: 'root')
-      - DB_PASSWORD (no default; must be set)
-      - DB_NAME (no default; must be set)
-
-    You can also override any of these by passing arguments directly.
-    """
 
     conn_config = {
         "host": host or os.getenv("DB_HOST", "localhost"),
@@ -45,16 +39,7 @@ def get_db_connection(
 
 
 if __name__ == "__main__":
-    """
-    Simple manual test:
-      1. Set your env vars, e.g.:
-         export DB_HOST=localhost
-         export DB_PORT=3306
-         export DB_USER=root
-         export DB_PASSWORD=your_password_here
-         export DB_NAME=your_database_name
-      2. Run: python db_connection.py
-    """
+
     try:
         conn = get_db_connection()
         print("Successfully connected to MySQL.")

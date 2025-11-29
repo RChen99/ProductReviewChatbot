@@ -8,22 +8,37 @@ interface ProductCardProps {
   reviews: number;
   prime?: boolean;
   discount?: string;
+  // Optional color theme for holiday badges/icons
+  color?: 'red' | 'green';
 }
 
-export function ProductCard({ title, price, originalPrice, rating, reviews, prime = false, discount }: ProductCardProps) {
+export function ProductCard({
+  title,
+  price,
+  originalPrice,
+  rating,
+  reviews,
+  prime = false,
+  discount,
+  color = 'red'
+}: ProductCardProps) {
+  const badgeColorClass = color === 'green' ? 'bg-green-600' : 'bg-red-600';
+  const giftColorClass = color === 'green' ? 'text-green-600' : 'text-red-600';
+
   return (
     <div className="bg-white p-6 rounded hover:shadow-lg transition-shadow cursor-pointer border border-gray-200 relative">
       {discount && (
-        <div className="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs">
+        <div className={`absolute top-2 right-2 ${badgeColorClass} text-white px-4 py-2 rounded-full text-sm`}>
           {discount}
         </div>
       )}
       <div className="mb-4 flex items-center justify-center py-6">
-        <Gift className="w-16 h-16 text-red-600" />
+        <Gift className={`w-16 h-16 ${giftColorClass}`} />
       </div>
       <div>
         <h3 className="mb-3 text-gray-900">{title}</h3>
         <div className="flex items-center gap-1 mb-3">
+          <span className="text-sm text-gray-900 font-medium">{rating.toFixed(1)}</span>
           <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
               <Star
