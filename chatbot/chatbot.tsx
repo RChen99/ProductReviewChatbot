@@ -27,7 +27,7 @@ function ChatbotDialog({
       {/* Header */}
       <div className="bg-gray-800 text-white p-4 rounded-t-lg flex items-center justify-between">
         <div>
-          <h3 className="font-semibold">DS5110 Support</h3>
+          <h3 className="font-semibold">Chat Support</h3>
           <p className="text-sm text-gray-300">Online</p>
         </div>
         <button 
@@ -300,7 +300,7 @@ export function ChatbotStandalone() {
           {/* Header */}
           <div style={styles.chatHeader}>
             <div>
-              <h3 style={styles.headerTitle}>DS5110 Support</h3>
+              <h3 style={styles.headerTitle}>Chat Support</h3>
               <p style={styles.headerStatus}>
                 <span style={{
                   display: 'inline-block',

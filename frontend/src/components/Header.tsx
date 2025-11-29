@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, MapPin, Menu } from 'lucide-react';
+import { Search, ShoppingCart, MapPin, Menu, ChevronDown } from 'lucide-react';
 
 export function Header() {
   return (
@@ -9,7 +9,10 @@ export function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <div className="px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer">
-              <span className="text-2xl">DS5110</span>
+              <div style={{ color: '#FF9900' }}>
+                <div style={{ fontSize: '12px' }}>Definitely Not</div>
+                <div style={{ paddingLeft: '2rem', fontSize: '24px' }}>Amazon</div>
+              </div>
             </div>
           </div>
 
@@ -17,7 +20,7 @@ export function Header() {
           <div className="hidden md:flex items-center px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer">
             <MapPin className="w-5 h-5 mr-1" />
             <div className="flex flex-col">
-              <span className="text-xs text-gray-300">Deliver to</span>
+              <span className="text-xs text-gray-300">Deliver to DS5110</span>
               <span className="text-sm">Boston 02108</span>
             </div>
           </div>
@@ -27,10 +30,10 @@ export function Header() {
             <div className="flex items-center w-full gap-2">
               <input
                 type="text"
-                placeholder="Search DS5110"
+                placeholder="Search Not Amazon"
                 className="flex-1 px-4 py-2 text-gray-900 focus:outline-none rounded-lg h-10"
               />
-              <button className="bg-[#febd69] hover:bg-[#f3a847] px-4 py-2 rounded-lg h-10">
+              <button className="px-4 py-2 rounded-lg h-10" style={{ backgroundColor: '#FF9900' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fa8900'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF9900'}>
                 <Search className="w-5 h-5 text-gray-900" />
               </button>
             </div>
@@ -40,8 +43,11 @@ export function Header() {
           <div className="flex items-center gap-6">
             {/* Account & Lists */}
             <div className="hidden lg:flex flex-col px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer">
-              <span className="text-xs">Hello, Sign In</span>
-              <span className="text-sm">Account & Lists</span>
+              <span className="text-xs">Hello, DS5110</span>
+              <div className="flex items-center gap-1">
+                <span className="text-sm">Account & Lists</span>
+                <ChevronDown className="w-4 h-4" />
+              </div>
             </div>
 
             {/* Returns & Orders */}

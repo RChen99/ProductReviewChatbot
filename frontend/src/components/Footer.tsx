@@ -13,7 +13,7 @@ export function Footer() {
       <div className="border-t border-gray-600 bg-[#131921]">
         <div className="max-w-[1500px] mx-auto px-8 py-6">
           <div className="text-center text-white">
-            DS 5110 Project
+            DS5110 Project
           </div>
         </div>
       </div>
