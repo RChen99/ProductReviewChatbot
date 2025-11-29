@@ -3,6 +3,7 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { HeroBanner } from '../components/HeroBanner';
 import { Footer } from '../components/Footer';
+import { ChatbotStandalone } from '../../../chatbot/chatbot';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,8 @@ export function Layout({ children }: LayoutProps) {
       </main>
 
       <Footer />
+
+      <ChatbotStandalone />
     </div>
   );
 }
