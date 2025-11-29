@@ -1,6 +1,23 @@
 import { Search, ShoppingCart, MapPin, Menu, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function Header() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate('/product');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <header className="bg-[#131921] text-white">
       {/* Top Header */}
@@ -8,7 +25,7 @@ export function Header() {
         <div className="mx-auto flex items-center gap-4">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer">
+            <div className="px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer" onClick={() => navigate('/')}>
               <div style={{ color: '#FF9900' }}>
                 <div style={{ fontSize: '12px' }}>Definitely Not</div>
                 <div style={{ paddingLeft: '2rem', fontSize: '24px' }}>Amazon</div>
@@ -32,8 +49,17 @@ export function Header() {
                 type="text"
                 placeholder="Search Not Amazon"
                 className="flex-1 px-4 py-2 text-gray-900 focus:outline-none rounded-lg h-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
               />
-              <button className="px-4 py-2 rounded-lg h-10" style={{ backgroundColor: '#FF9900' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fa8900'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF9900'}>
+              <button 
+                className="px-4 py-2 rounded-lg h-10" 
+                style={{ backgroundColor: '#FF9900' }} 
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#fa8900'} 
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF9900'}
+                onClick={handleSearch}
+              >
                 <Search className="w-5 h-5 text-gray-900" />
               </button>
             </div>
