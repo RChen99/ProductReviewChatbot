@@ -47,7 +47,7 @@ export function Header() {
             <div className="flex items-center w-full gap-2">
               <input
                 type="text"
-                placeholder="Search Not Amazon"
+                placeholder="Definitely Not Searching On Amazon"
                 className="flex-1 px-4 py-2 text-gray-900 focus:outline-none rounded-lg h-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
