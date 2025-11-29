@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { Star, Shield, RotateCcw, Truck, Gift, MapPin } from 'lucide-react';
+import { Star, Shield, RotateCcw, Truck, Gift, MapPin, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import './product.css';
 
@@ -50,6 +50,12 @@ export default function ProductPage() {
           {/* Left Column - Gift Icons */}
           <div className="product-image-column">
             <div className="product-image-container">
+              {/* Category Section */}
+              <div className="product-category-section">
+                <span className="product-category-label">Category</span>
+                <ChevronRight className="product-category-arrow" />
+                <span className="product-category-value">Test</span>
+              </div>
               {/* Main Gift Icon */}
               <div className="product-main-image">
                 <Gift className={`${giftIcons[selectedImage].color}`} style={{ width: '200px', height: '200px' }} />
