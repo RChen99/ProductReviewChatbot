@@ -1,12 +1,20 @@
 import { Search, ShoppingCart, MapPin, Menu, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCartContext } from '../app/layout';
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartCount } = useCartContext();
+
+  // Clear search query when on home page
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setSearchQuery('');
+    }
+  }, [location.pathname]);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
