@@ -1,5 +1,4 @@
 # 8 Analytical SQL Queries
-
 from flask import jsonify, request
 from db.db_connection import get_db_connection
 
