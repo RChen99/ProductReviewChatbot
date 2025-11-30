@@ -1,3 +1,5 @@
+# 8 Analytical SQL Queries
+
 from flask import jsonify, request
 from db.db_connection import get_db_connection
 
@@ -464,10 +466,10 @@ def register_routes(app):
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
             
-            # Get summary stats by category
+            # Get summary stats by first category segment
             cursor.execute("""
                 SELECT 
-                    p.category,
+                    SUBSTRING_INDEX(p.category, '|', 1) AS first_category,
                     AVG(r.sentiment_score) as avg_sentiment,
                     AVG(r.rating) as avg_rating,
                     COUNT(r.review_id) as review_count,
@@ -477,19 +479,18 @@ def register_routes(app):
                 WHERE p.category IS NOT NULL 
                     AND p.category != ''
                     AND r.sentiment_score IS NOT NULL
-                GROUP BY p.category
-                HAVING COUNT(r.review_id) >= 10
+                GROUP BY first_category
+                HAVING COUNT(r.review_id) >= 1
                 ORDER BY avg_sentiment DESC
-                LIMIT 20
             """)
             summary_results = cursor.fetchall()
             
-            # Get top 5 products for each category
+            # Get top 5 products for each first-level category
             final_results = []
             for summary in summary_results:
-                category = summary['category']
+                first_category = summary['first_category']
                 
-                # Get top 5 products in this category
+                # Get top 5 products in this first-level category (including all subcategories)
                 cursor.execute("""
                     SELECT 
                         p.product_id,
@@ -498,18 +499,18 @@ def register_routes(app):
                         COUNT(r.review_id) as review_count
                     FROM products p
                     JOIN reviews r ON p.product_id = r.product_id
-                    WHERE p.category = %s
+                    WHERE SUBSTRING_INDEX(p.category, '|', 1) = %s
                         AND r.sentiment_score IS NOT NULL
                     GROUP BY p.product_id, p.product_name
                     HAVING COUNT(r.review_id) >= 1
                     ORDER BY avg_rating DESC, review_count DESC
                     LIMIT 5
-                """, (category,))
+                """, (first_category,))
                 top_products = cursor.fetchall()
                 
                 # Format the result
                 result = {
-                    'category': category,
+                    'category': first_category,
                     'avg_sentiment': float(summary['avg_sentiment']) if summary['avg_sentiment'] else 0.0,
                     'avg_rating': float(summary['avg_rating']) if summary['avg_rating'] else 0.0,
                     'review_count': int(summary['review_count']) if summary['review_count'] else 0,

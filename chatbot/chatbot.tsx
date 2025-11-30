@@ -324,12 +324,9 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
       
       case 5: // Sentiment by Category
         let result5 = 'Sentiment Distribution by Category:\n\n';
-        data.slice(0, 10).forEach(item => {
-          // Extract last part of category after last |
-          const fullCategory = item.category || 'Uncategorized';
-          const cat = fullCategory.includes('|') 
-            ? fullCategory.split('|').pop() || fullCategory 
-            : fullCategory;
+        data.forEach(item => {
+          // Use the first category segment directly from backend
+          const cat = item.category || 'Uncategorized';
           const sentiment5 = item.avg_sentiment || 0;
           result5 += `${cat}:\n  Avg Sentiment: ${sentiment5.toFixed(2)} - ${getSentimentLabel(sentiment5)}\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Reviews: ${item.review_count || 0}\n  Products: ${item.product_count || 0}\n`;
           
