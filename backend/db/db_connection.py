@@ -28,12 +28,12 @@ def get_db_connection(
 
     try:
         connection = mysql.connector.connect(**conn_config)
-        # Optional: ensure we actually connected
+        # Ensure we actually connected
         if not connection.is_connected():
             raise Error("Failed to establish MySQL connection")
         return connection
     except Error as exc:
-        # Re-raise with a clearer message; caller can handle/log as needed
+       # Raise connection error
         raise RuntimeError(f"Error connecting to MySQL: {exc}") from exc
 
 
