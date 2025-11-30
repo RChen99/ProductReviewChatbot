@@ -7,7 +7,6 @@ from mysql.connector import MySQLConnection, Error
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load backend/.env
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 

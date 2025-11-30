@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './layout';
 import { Products } from './content';
 import ProductPage from './product/page';
+import SearchPage from './search/page';
 import './globals.css';
 
 function App() {
@@ -19,6 +20,11 @@ function App() {
         <Route path="/product" element={
           <Layout>
             <ProductPage />
+          </Layout>
+        } />
+        <Route path="/search" element={
+          <Layout>
+            <SearchPage />
           </Layout>
         } />
       </Routes>

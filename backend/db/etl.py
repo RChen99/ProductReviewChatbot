@@ -19,7 +19,7 @@ from db_connection import get_db_connection
 
 
 CSV_PATH_DEFAULT = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
     "cleaned_amazon_reviews.csv",
 )
 
@@ -82,16 +82,24 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
                     product_link = VALUES(product_link)
             """
 
+            category = row.get("category", "")
+            if category:
+                category = category.replace(",", "|")
+            
+            about_product = row.get("about_product", "")
+            if about_product:
+                about_product = about_product.replace("|", ". ")
+            
             cursor.execute(
                 product_sql,
                 (
                     product_id,
                     row["product_name"],
-                    row.get("category"),
+                    category,
                     _safe_float(row.get("actual_price", "")),
                     _safe_float(row.get("discounted_price", "")),
                     _safe_float(row.get("discount_percentage", "")),
-                    row.get("about_product"),
+                    about_product,
                     row.get("img_link"),
                     row.get("product_link"),
                 ),

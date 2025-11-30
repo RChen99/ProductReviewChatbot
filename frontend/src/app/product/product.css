@@ -218,6 +218,24 @@
   color: #15803d;
 }
 
+.product-about-section {
+  margin-top: 1.5rem;
+}
+
+.product-about-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.product-about-content {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 /* Right Column - Buy Box */
 .product-buy-box-column {
   grid-column: span 3;

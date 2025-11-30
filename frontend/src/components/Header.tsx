@@ -1,14 +1,16 @@
 import { Search, ShoppingCart, MapPin, Menu, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCartContext } from '../app/layout';
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { cartCount } = useCartContext();
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate('/product');
+      navigate(`/product?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -47,7 +49,7 @@ export function Header() {
             <div className="flex items-center w-full gap-2">
               <input
                 type="text"
-                placeholder="Definitely Not Searching On Amazon"
+                placeholder="Definitely Not Searching Amazon"
                 className="flex-1 px-4 py-2 text-gray-900 focus:outline-none rounded-lg h-10"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -85,7 +87,7 @@ export function Header() {
             {/* Cart */}
             <div className="flex items-center px-2 py-1 border border-transparent hover:border-white rounded cursor-pointer relative">
               <ShoppingCart className="w-8 h-8" />
-              <span className="absolute top-0 left-5 bg-[#f08804] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+              <span className="absolute top-0 left-5 bg-[#f08804] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{cartCount}</span>
               <span className="ml-1 hidden sm:block">Cart</span>
             </div>
           </div>

@@ -1,0 +1,27 @@
+.search-page {
+  background-color: white;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.search-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.search-results-header {
+  margin-bottom: 2rem;
+}
+
+.search-results-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.search-results-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+

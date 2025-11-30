@@ -137,8 +137,12 @@ export function Chatbot() {
   );
 }
 
-// Chatbot Standalone Component
-export function ChatbotStandalone() {
+interface ChatbotStandaloneProps {
+  currentProduct?: any;
+  onSearchProduct?: (productName: string) => void;
+}
+
+export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: ChatbotStandaloneProps) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([
@@ -157,16 +161,39 @@ export function ChatbotStandalone() {
         sender: 'user'
       };
       
-      setMessages([...messages, userMessage]);
+      setMessages(prev => [...prev, userMessage]);
+      const userMessageText = message.trim();
       setMessage('');
       
       setTimeout(() => {
-        const botMessage = {
-          id: messages.length + 2,
-          text: 'Thanks for your message! I\'m here to help you find the best holiday deals. What are you looking for?',
-          sender: 'bot'
-        };
-        setMessages(prev => [...prev, botMessage]);
+        if (!currentProduct) {
+          if (onSearchProduct && userMessageText) {
+            onSearchProduct(userMessageText);
+            const botMessage = {
+              id: messages.length + 2,
+              text: `Searching for ${userMessageText}...`,
+              sender: 'bot'
+            };
+            setMessages(prev => [...prev, botMessage]);
+          } else {
+            const botMessage = {
+              id: messages.length + 2,
+              text: 'Please provide me with the product name, or search one up',
+              sender: 'bot'
+            };
+            setMessages(prev => [...prev, botMessage]);
+          }
+        } else {
+          const productName = currentProduct.product_name || 'this product';
+          const productPrice = currentProduct.discounted_price || 0;
+          const productRating = currentProduct.avg_rating || 0;
+          const botMessage = {
+            id: messages.length + 2,
+            text: `I can help you with ${productName}. It's priced at $${productPrice.toFixed(2)} and has a ${productRating.toFixed(1)} star rating. What would you like to know?`,
+            sender: 'bot'
+          };
+          setMessages(prev => [...prev, botMessage]);
+        }
       }, 1000);
     }
   };
