@@ -48,3 +48,147 @@ export async function getProductById(productId: string): Promise<Product> {
   }
 }
 
+export interface Review {
+  review_id: string;
+  review_title: string | null;
+  review_content: string | null;
+  rating: number;
+  sentiment_label: string | null;
+  user_name: string | null;
+}
+
+export interface ReviewsResponse {
+  reviews: Review[];
+  total: number;
+  limit: number;
+  offset: number;
+  has_more: boolean;
+}
+
+export async function getProductReviews(productId: string, limit: number = 5, offset: number = 0): Promise<ReviewsResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/reviews?limit=${limit}&offset=${offset}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch reviews: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    throw error;
+  }
+}
+
+// Analytics API Functions
+export async function getTopRatedByCategory() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/top-rated-by-category`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching top rated by category:', error);
+    throw error;
+  }
+}
+
+export async function getSentimentByPriceRange() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/sentiment-by-price-range`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching sentiment by price range:', error);
+    throw error;
+  }
+}
+
+export async function getBestValueProducts() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/best-value-products`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching best value products:', error);
+    throw error;
+  }
+}
+
+export async function getReviewLengthRating() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/review-length-rating`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching review length rating:', error);
+    throw error;
+  }
+}
+
+export async function getSentimentByCategory() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/sentiment-by-category`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching sentiment by category:', error);
+    throw error;
+  }
+}
+
+export async function getDiscountReviewQuality() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/discount-review-quality`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching discount review quality:', error);
+    throw error;
+  }
+}
+
+export async function getRatingVariance() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/rating-variance`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching rating variance:', error);
+    throw error;
+  }
+}
+
+export async function getSentimentRatingComparison() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/analytics/sentiment-rating-comparison`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch data: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching sentiment rating comparison:', error);
+    throw error;
+  }
+}
+

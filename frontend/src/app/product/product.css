@@ -333,6 +333,124 @@
   color: #4b5563;
 }
 
+/* Reviews Section */
+.product-reviews-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #d1d5db;
+}
+
+.product-reviews-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #111827;
+}
+
+.product-reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.product-review-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background-color: white;
+}
+
+.product-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.product-review-user-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.product-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.product-review-star {
+  width: 1rem;
+  height: 1rem;
+}
+
+.product-star-filled {
+  fill: #f08804;
+  color: #f08804;
+}
+
+.product-star-empty {
+  color: #d1d5db;
+}
+
+.product-review-rating-number {
+  font-size: 0.875rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.product-review-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.product-review-content {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.product-reviews-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.product-reviews-load-more-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #ff9900;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.product-reviews-load-more-button:hover:not(:disabled) {
+  background-color: #fa8900;
+}
+
+.product-reviews-load-more-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.product-reviews-load-more-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 /* Star Rating */
 .product-star-filled {
   fill: #f08804;

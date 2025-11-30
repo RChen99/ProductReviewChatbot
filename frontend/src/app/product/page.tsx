@@ -1,9 +1,9 @@
 // @ts-nocheck
 import React from 'react';
-import { Star, Shield, RotateCcw, Truck, Gift, MapPin } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Star, Shield, RotateCcw, Truck, Gift, MapPin, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { searchProducts, getProductById, Product } from '../../services/api';
+import { searchProducts, getProductById, Product, getProductReviews, Review, ReviewsResponse } from '../../services/api';
 import { useProductContext, useCartContext } from '../layout';
 import './product.css';
 
@@ -17,6 +17,10 @@ export default function ProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsOffset, setReviewsOffset] = useState(0);
+  const [hasMoreReviews, setHasMoreReviews] = useState(false);
 
   const giftIcons = [
     { color: 'gift-icon-gray' },
@@ -24,10 +28,38 @@ export default function ProductPage() {
     { color: 'gift-icon-green' }
   ];
 
+  const fetchReviews = useCallback(async (productId: string, limit: number, offset: number) => {
+    setReviewsLoading(true);
+    try {
+      const response: ReviewsResponse = await getProductReviews(productId, limit, offset);
+      if (offset === 0) {
+        setReviews(response.reviews);
+      } else {
+        setReviews(prev => [...prev, ...response.reviews]);
+      }
+      setReviewsOffset(offset + response.reviews.length);
+      setHasMoreReviews(response.has_more);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, []);
+
+  const handleLoadMoreReviews = () => {
+    if (product && !reviewsLoading) {
+      fetchReviews(product.product_id, 5, reviewsOffset);
+    }
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
+      // Reset reviews when loading new product
+      setReviews([]);
+      setReviewsOffset(0);
+      setHasMoreReviews(false);
       
       try {
         const query = searchParams.get('q');
@@ -37,6 +69,8 @@ export default function ProductPage() {
           const productData = await getProductById(productId);
           setProduct(productData);
           setCurrentProduct(productData);
+          // Fetch initial reviews
+          fetchReviews(productId, 5, 0);
         } else if (query) {
           const products = await searchProducts(query);
           if (products.length === 0) {
@@ -46,6 +80,8 @@ export default function ProductPage() {
             const firstProduct = await getProductById(products[0].product_id);
             setProduct(firstProduct);
             setCurrentProduct(firstProduct);
+            // Fetch initial reviews
+            fetchReviews(firstProduct.product_id, 5, 0);
           } else {
             navigate(`/search?q=${encodeURIComponent(query)}`);
             return;
@@ -65,7 +101,7 @@ export default function ProductPage() {
     };
 
     fetchProduct();
-  }, [searchParams, setCurrentProduct]);
+  }, [searchParams, setCurrentProduct, navigate, fetchReviews]);
 
   const today = new Date();
   const deliveryDate = new Date(today);
@@ -261,6 +297,57 @@ export default function ProductPage() {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        {product && reviews.length > 0 && (
+          <div className="product-reviews-section">
+            <h2 className="product-reviews-title">Customer Reviews</h2>
+            <div className="product-reviews-list">
+              {reviews.map((review) => (
+                <div key={review.review_id} className="product-review-card">
+                  <div className="product-review-header">
+                    <div className="product-review-user">
+                      <span className="product-review-user-name">
+                        {review.user_name || 'Anonymous'}
+                      </span>
+                    </div>
+                    <div className="product-review-rating">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`product-review-star ${
+                            i < Math.floor(review.rating) ? 'product-star-filled' : 'product-star-empty'
+                          }`}
+                        />
+                      ))}
+                      <span className="product-review-rating-number">
+                        {review.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+                  {review.review_title && (
+                    <h3 className="product-review-title">{review.review_title}</h3>
+                  )}
+                  {review.review_content && (
+                    <p className="product-review-content">{review.review_content}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            {hasMoreReviews && (
+              <div className="product-reviews-load-more">
+                <button
+                  onClick={handleLoadMoreReviews}
+                  disabled={reviewsLoading}
+                  className="product-reviews-load-more-button"
+                >
+                  <span>Load More Reviews</span>
+                  <ChevronDown className="product-reviews-load-more-icon" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

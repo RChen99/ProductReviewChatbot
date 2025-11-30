@@ -3,8 +3,8 @@
   position: fixed;
   bottom: 128px;
   right: 24px;
-  width: 400px;
-  height: 550px;
+  width: 450px;
+  height: 650px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -29,11 +29,11 @@
 .chatbot-header-title {
   font-weight: 600;
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .chatbot-header-status {
-  font-size: 14px;
+  font-size: 16px;
   color: #d1d5db;
   margin: 0;
 }
@@ -91,6 +91,10 @@
   max-width: 75%;
   padding: 12px;
   border-radius: 8px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.5;
 }
 
 .chatbot-message-bubble-user {
@@ -116,7 +120,7 @@
   padding: 8px 16px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   color: #111827;
   transition: border-color 0.2s;
