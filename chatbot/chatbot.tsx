@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './chatbot.css';
 import {
   getTopRatedByCategory,
@@ -17,7 +18,7 @@ import {
 interface ChatbotDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  messages: Array<{ id: number; text: string; sender: string }>;
+  messages: Array<{ id: number; text: string | React.ReactNode; sender: string }>;
   message: string;
   setMessage: (message: string) => void;
   onSend: () => void;
@@ -58,7 +59,7 @@ function ChatbotDialog({
             className="flex justify-start"
           >
             <div className="max-w-[75%] p-3 rounded-lg bg-gray-100 text-gray-900">
-              {msg.text}
+              {typeof msg.text === 'string' ? msg.text : msg.text}
             </div>
           </div>
         ))}
@@ -153,6 +154,7 @@ interface ChatbotStandaloneProps {
 }
 
 export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: ChatbotStandaloneProps) {
+  const navigate = useNavigate();
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [message, setMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -242,140 +244,363 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
     }
   };
 
-  const formatAnalyticalResponse = (queryNum: number, data: any[]): string => {
+  const formatAnalyticalResponse = (queryNum: number, data: any[]): React.ReactNode => {
     if (!data || data.length === 0) {
       return 'No data available for this query.';
     }
 
+    const handleProductClick = (productId: string) => {
+      navigate(`/product?product_id=${productId}`);
+    };
+
     switch(queryNum) {
       case 1: // Top-Rated Products by Category
-        let result = 'Top-Rated Products by Category:\n\n';
-        data.forEach(item => {
-          // Use the first category segment directly from backend
-          const cat = item.category || 'Uncategorized';
-          
-          result += `${cat}:\n`;
-          
-          // Display top 5 products for this category
-          if (item.top_products && item.top_products.length > 0) {
-            item.top_products.forEach((product: any, index: number) => {
-              const productName = product.product_name || 'N/A';
-              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-              result += `  ${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-            });
-          }
-          
-          result += `  Highest in ${cat}: ${item.avg_rating?.toFixed(1) || '0.0'}\n\n`;
-        });
-        return result.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Top-Rated Products by Category:</strong>
+            <br /><br />
+            {data.map((item, itemIndex) => {
+              const cat = item.category || 'Uncategorized';
+              return (
+                <div key={itemIndex}>
+                  <strong>{cat}:</strong>
+                  <br />
+                  <div style={{ marginLeft: '16px', marginTop: '4px' }}>
+                    Highest in {cat}: {item.avg_rating?.toFixed(1) || '0.0'}
+                  </div>
+                  {item.top_products && item.top_products.length > 0 ? (
+                    item.top_products.map((product: any, index: number) => {
+                      const productName = product.product_name || 'N/A';
+                      const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+                      const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+                      return (
+                        <div key={index} style={{ marginLeft: '16px', marginTop: '4px' }}>
+                          {index + 1}.{' '}
+                          <a
+                            href={`/product?product_id=${product.product_id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProductClick(product.product_id);
+                            }}
+                            style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                          >
+                            {displayName}
+                          </a>
+                        </div>
+                      );
+                    })
+                  ) : null}
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 2: // Sentiment by Price Range
-        let result2 = 'Sentiment Analysis by Price Range:\n\n';
-        data.forEach(item => {
-          result2 += `${item.price_range || 'Unknown'}:\n`;
-          const sentiment2 = item.avg_sentiment || 0;
-          result2 += `  Avg Sentiment: ${sentiment2.toFixed(2)} - ${getSentimentLabel(sentiment2)}\n`;
-          result2 += `  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n`;
-          result2 += `  Reviews: ${item.review_count || 0}\n`;
-          
-          // Add top 5 products for this price range
-          if (item.top_products && item.top_products.length > 0) {
-            item.top_products.forEach((product: any, index: number) => {
-              const productName = product.product_name || 'N/A';
-              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-              result2 += `  ${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-            });
-          }
-          
-          result2 += '\n';
-        });
-        return result2.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Sentiment Analysis by Price Range:</strong>
+            <br /><br />
+            {data.map((item, itemIndex) => {
+              const sentiment2 = item.avg_sentiment || 0;
+              return (
+                <div key={itemIndex}>
+                  <strong>{item.price_range || 'Unknown'}:</strong>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Sentiment: {sentiment2.toFixed(2)} - {getSentimentLabel(sentiment2)}
+                    <br />
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Reviews: {item.review_count || 0}
+                  </div>
+                  {item.top_products && item.top_products.length > 0 ? (
+                    item.top_products.map((product: any, index: number) => {
+                      const productName = product.product_name || 'N/A';
+                      const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+                      const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+                      return (
+                        <div key={index} style={{ marginLeft: '16px', marginTop: '4px' }}>
+                          {index + 1}.{' '}
+                          <a
+                            href={`/product?product_id=${product.product_id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProductClick(product.product_id);
+                            }}
+                            style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                          >
+                            {displayName}
+                          </a>
+                        </div>
+                      );
+                    })
+                  ) : null}
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 3: // Best Value Products
-        let result3 = 'Best Value Products (High Rating + Low Price):\n\n';
-        data.forEach((item, index) => {
-          const productName = item.product_name || 'N/A';
-          const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-          result3 += `${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-          result3 += `   Price: $${item.discounted_price?.toFixed(2) || '0.00'}\n`;
-          result3 += `   Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n`;
-          result3 += `   Reviews: ${item.review_count || 0}\n\n`;
-        });
-        return result3.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Best Value Products (High Rating + Low Price):</strong>
+            <br /><br />
+            {data.map((item, index) => {
+              const productName = item.product_name || 'N/A';
+              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+              const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+              return (
+                <div key={index}>
+                  {index + 1}.{' '}
+                  <a
+                    href={`/product?product_id=${item.product_id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(item.product_id);
+                    }}
+                    style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {displayName}
+                  </a>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Price: ${item.discounted_price?.toFixed(2) || '0.00'}
+                    <br />
+                    Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Reviews: {item.review_count || 0}
+                  </div>
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 4: // Review Length vs Rating
-        let result4 = 'Review Length vs Rating Correlation:\n\n';
-        data.forEach(item => {
-          const sentiment4 = item.avg_sentiment || 0;
-          result4 += `${item.length_category}:\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Avg Sentiment: ${sentiment4.toFixed(2)} - ${getSentimentLabel(sentiment4)}\n  Reviews: ${item.review_count || 0}\n`;
-          
-          // Add top 5 products for this length category
-          if (item.top_products && item.top_products.length > 0) {
-            item.top_products.forEach((product: any, index: number) => {
-              const productName = product.product_name || 'N/A';
-              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-              result4 += `  ${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-            });
-          }
-          
-          result4 += '\n';
-        });
-        return result4.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Review Length vs Rating Correlation:</strong>
+            <br /><br />
+            {data.map((item, itemIndex) => {
+              const sentiment4 = item.avg_sentiment || 0;
+              return (
+                <div key={itemIndex}>
+                  <strong>{item.length_category}:</strong>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Avg Sentiment: {sentiment4.toFixed(2)} - {getSentimentLabel(sentiment4)}
+                    <br />
+                    Reviews: {item.review_count || 0}
+                  </div>
+                  {item.top_products && item.top_products.length > 0 ? (
+                    item.top_products.map((product: any, index: number) => {
+                      const productName = product.product_name || 'N/A';
+                      const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+                      const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+                      return (
+                        <div key={index} style={{ marginLeft: '16px', marginTop: '4px' }}>
+                          {index + 1}.{' '}
+                          <a
+                            href={`/product?product_id=${product.product_id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProductClick(product.product_id);
+                            }}
+                            style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                          >
+                            {displayName}
+                          </a>
+                        </div>
+                      );
+                    })
+                  ) : null}
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 5: // Sentiment by Category
-        let result5 = 'Sentiment Distribution by Category:\n\n';
-        data.forEach(item => {
-          // Use the first category segment directly from backend
-          const cat = item.category || 'Uncategorized';
-          const sentiment5 = item.avg_sentiment || 0;
-          result5 += `${cat}:\n  Avg Sentiment: ${sentiment5.toFixed(2)} - ${getSentimentLabel(sentiment5)}\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Reviews: ${item.review_count || 0}\n  Products: ${item.product_count || 0}\n`;
-          
-          // Add top 5 products for this category
-          if (item.top_products && item.top_products.length > 0) {
-            item.top_products.forEach((product: any, index: number) => {
-              const productName = product.product_name || 'N/A';
-              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-              result5 += `  ${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-            });
-          }
-          
-          result5 += '\n';
-        });
-        return result5.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Sentiment Distribution by Category:</strong>
+            <br /><br />
+            {data.map((item, itemIndex) => {
+              const cat = item.category || 'Uncategorized';
+              const sentiment5 = item.avg_sentiment || 0;
+              return (
+                <div key={itemIndex}>
+                  <strong>{cat}:</strong>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Sentiment: {sentiment5.toFixed(2)} - {getSentimentLabel(sentiment5)}
+                    <br />
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Reviews: {item.review_count || 0}
+                    <br />
+                    Products: {item.product_count || 0}
+                  </div>
+                  {item.top_products && item.top_products.length > 0 ? (
+                    item.top_products.map((product: any, index: number) => {
+                      const productName = product.product_name || 'N/A';
+                      const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+                      const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+                      return (
+                        <div key={index} style={{ marginLeft: '16px', marginTop: '4px' }}>
+                          {index + 1}.{' '}
+                          <a
+                            href={`/product?product_id=${product.product_id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProductClick(product.product_id);
+                            }}
+                            style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                          >
+                            {displayName}
+                          </a>
+                        </div>
+                      );
+                    })
+                  ) : null}
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 6: // Discount Impact on Reviews
-        let result6 = 'Discount Impact on Review Quality:\n\n';
-        data.forEach(item => {
-          const sentiment6 = item.avg_sentiment || 0;
-          result6 += `${item.discount_range}:\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Avg Sentiment: ${sentiment6.toFixed(2)} - ${getSentimentLabel(sentiment6)}\n  Reviews: ${item.review_count || 0}\n  Products: ${item.product_count || 0}\n`;
-          
-          // Add top 5 products for this discount range
-          if (item.top_products && item.top_products.length > 0) {
-            item.top_products.forEach((product: any, index: number) => {
-              const productName = product.product_name || 'N/A';
-              const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
-              result6 += `  ${index + 1}. ${firstFiveWords}${productName.split(' ').length > 5 ? '...' : ''}\n`;
-            });
-          }
-          
-          result6 += '\n';
-        });
-        return result6.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Discount Impact on Review Quality:</strong>
+            <br /><br />
+            {data.map((item, itemIndex) => {
+              const sentiment6 = item.avg_sentiment || 0;
+              return (
+                <div key={itemIndex}>
+                  <strong>{item.discount_range}:</strong>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Avg Sentiment: {sentiment6.toFixed(2)} - {getSentimentLabel(sentiment6)}
+                    <br />
+                    Reviews: {item.review_count || 0}
+                    <br />
+                    Products: {item.product_count || 0}
+                  </div>
+                  {item.top_products && item.top_products.length > 0 ? (
+                    item.top_products.map((product: any, index: number) => {
+                      const productName = product.product_name || 'N/A';
+                      const firstFiveWords = productName.split(' ').slice(0, 5).join(' ');
+                      const displayName = firstFiveWords + (productName.split(' ').length > 5 ? '...' : '');
+                      return (
+                        <div key={index} style={{ marginLeft: '16px', marginTop: '4px' }}>
+                          {index + 1}.{' '}
+                          <a
+                            href={`/product?product_id=${product.product_id}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleProductClick(product.product_id);
+                            }}
+                            style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                          >
+                            {displayName}
+                          </a>
+                        </div>
+                      );
+                    })
+                  ) : null}
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 7: // Rating Variance
-        let result7 = 'Products with Most Consistent Ratings:\n\n';
-        data.slice(0, 10).forEach(item => {
-          result7 += `${item.product_name?.substring(0, 50) || 'N/A'}...\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Consistency (std dev): ${item.rating_stddev?.toFixed(2) || '0.00'}\n  Range: ${item.min_rating || '0'} - ${item.max_rating || '0'} stars\n  Reviews: ${item.review_count || 0}\n\n`;
-        });
-        return result7.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Products with Most Consistent Ratings:</strong>
+            <br /><br />
+            {data.slice(0, 10).map((item, index) => {
+              const productName = item.product_name || 'N/A';
+              const displayName = productName.substring(0, 50) + (productName.length > 50 ? '...' : '');
+              return (
+                <div key={index}>
+                  <a
+                    href={`/product?product_id=${item.product_id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(item.product_id);
+                    }}
+                    style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {displayName}
+                  </a>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Consistency (std dev): {item.rating_stddev?.toFixed(2) || '0.00'}
+                    <br />
+                    Range: {item.min_rating || '0'} - {item.max_rating || '0'} stars
+                    <br />
+                    Reviews: {item.review_count || 0}
+                  </div>
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       case 8: // Sentiment vs Rating Comparison
-        let result8 = 'Sentiment vs Rating Comparison:\n\n';
-        data.slice(0, 10).forEach(item => {
-          const sentiment8 = item.avg_sentiment || 0;
-          result8 += `${item.product_name?.substring(0, 50) || 'N/A'}...\n  Avg Rating: ${item.avg_rating?.toFixed(1) || '0.0'} stars\n  Avg Sentiment: ${sentiment8.toFixed(2)} - ${getSentimentLabel(sentiment8)}\n  Status: ${item.comparison || 'Unknown'}\n  Reviews: ${item.review_count || 0}\n\n`;
-        });
-        return result8.trim();
+        return (
+          <div style={{ whiteSpace: 'pre-wrap' }}>
+            <strong>Sentiment vs Rating Comparison:</strong>
+            <br /><br />
+            {data.slice(0, 10).map((item, index) => {
+              const sentiment8 = item.avg_sentiment || 0;
+              const productName = item.product_name || 'N/A';
+              const displayName = productName.substring(0, 50) + (productName.length > 50 ? '...' : '');
+              return (
+                <div key={index}>
+                  <a
+                    href={`/product?product_id=${item.product_id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(item.product_id);
+                    }}
+                    style={{ color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}
+                  >
+                    {displayName}
+                  </a>
+                  <br />
+                  <div style={{ marginLeft: '16px' }}>
+                    Avg Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
+                    <br />
+                    Avg Sentiment: {sentiment8.toFixed(2)} - {getSentimentLabel(sentiment8)}
+                    <br />
+                    Status: {item.comparison || 'Unknown'}
+                    <br />
+                    Reviews: {item.review_count || 0}
+                  </div>
+                  <br />
+                </div>
+              );
+            })}
+          </div>
+        );
       
       default:
         return 'Unknown query type.';
@@ -576,7 +801,7 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
                     msg.sender === 'user' ? 'chatbot-message-bubble-user' : 'chatbot-message-bubble-bot'
                   }`}
                 >
-                  {msg.text}
+                  {typeof msg.text === 'string' ? msg.text : msg.text}
                 </div>
               </div>
             ))}
