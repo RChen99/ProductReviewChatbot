@@ -50,8 +50,8 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
     products, users and reviews tables.
 
     NOTE: The CSV stores multiple users / reviews for a product
-    in comma-separated lists. For simplicity, this ETL uses ONLY
-    the first user / first review entry from each row.
+    in comma-separated lists. This ETL processes ALL reviews
+    from each row and inserts them as separate review records.
     """
 
     conn = get_db_connection()
@@ -105,26 +105,9 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
                 ),
             )
 
-            # --- USERS (take first user) ---
+            # --- USERS and REVIEWS (process ALL reviews) ---
             user_ids = [u.strip() for u in row.get("user_id", "").split(",") if u.strip()]
             user_names = [u.strip() for u in row.get("user_name", "").split(",") if u.strip()]
-
-            if not user_ids:
-                # No user information; skip reviews for this row
-                continue
-
-            user_id = user_ids[0]
-            user_name = user_names[0] if user_names else None
-
-            user_sql = """
-                INSERT INTO users (user_id, user_name)
-                VALUES (%s, %s)
-                ON DUPLICATE KEY UPDATE
-                    user_name = VALUES(user_name)
-            """
-            cursor.execute(user_sql, (user_id, user_name))
-
-            # --- REVIEWS (take first review) ---
             review_ids = [r.strip() for r in row.get("review_id", "").split(",") if r.strip()]
             review_titles = [r.strip() for r in row.get("review_title", "").split(",") if r.strip()]
             review_contents = [
@@ -132,52 +115,84 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
             ]
 
             if not review_ids:
+                # No reviews for this product; skip
                 continue
 
-            review_id = review_ids[0]
-            review_title = review_titles[0] if review_titles else None
-            review_content = review_contents[0] if review_contents else None
-
+            # Get product-level rating (used for all reviews if individual ratings not available)
             rating_value = _safe_float(row.get("rating", ""))
             rating_int: Optional[int] = None
             if rating_value is not None:
                 rating_int = max(1, min(5, int(round(rating_value))))
 
-            sentiment_score = _safe_float(row.get("sentiment_score", ""))
-            review_length = _safe_int(row.get("review_length", ""))
+            # Process each review
+            num_reviews = len(review_ids)
+            for i in range(num_reviews):
+                # Get user for this review (match by index)
+                if i < len(user_ids):
+                    user_id = user_ids[i]
+                    user_name = user_names[i] if i < len(user_names) else None
+                else:
+                    # Fallback to first user if not enough users
+                    user_id = user_ids[0] if user_ids else None
+                    user_name = user_names[0] if user_names else None
 
-            review_sql = """
-                INSERT INTO reviews (
-                    review_id, product_id, user_id,
-                    review_title, review_content,
-                    rating, sentiment_score, sentiment_label,
-                    review_length, review_date
+                if not user_id:
+                    continue
+
+                # Insert/update user
+                user_sql = """
+                    INSERT INTO users (user_id, user_name)
+                    VALUES (%s, %s)
+                    ON DUPLICATE KEY UPDATE
+                        user_name = VALUES(user_name)
+                """
+                cursor.execute(user_sql, (user_id, user_name))
+
+                # Get review data for this review
+                review_id = review_ids[i]
+                review_title = review_titles[i] if i < len(review_titles) else None
+                review_content = review_contents[i] if i < len(review_contents) else None
+
+                # Calculate review_length for this specific review
+                review_length = len(review_content) if review_content else 0
+
+                # Get sentiment_score if available (might be per-review or per-product)
+                # For now, use product-level sentiment_score for all reviews
+                sentiment_score = _safe_float(row.get("sentiment_score", ""))
+
+                # Insert/update review
+                review_sql = """
+                    INSERT INTO reviews (
+                        review_id, product_id, user_id,
+                        review_title, review_content,
+                        rating, sentiment_score, sentiment_label,
+                        review_length, review_date
+                    )
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    ON DUPLICATE KEY UPDATE
+                        review_title = VALUES(review_title),
+                        review_content = VALUES(review_content),
+                        rating = VALUES(rating),
+                        sentiment_score = VALUES(sentiment_score),
+                        sentiment_label = VALUES(sentiment_label),
+                        review_length = VALUES(review_length)
+                """
+
+                cursor.execute(
+                    review_sql,
+                    (
+                        review_id,
+                        product_id,
+                        user_id,
+                        review_title,
+                        review_content,
+                        rating_int,
+                        sentiment_score,
+                        row.get("sentiment_label"),
+                        review_length,
+                        None,  # review_date not available in CSV
+                    ),
                 )
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                ON DUPLICATE KEY UPDATE
-                    review_title = VALUES(review_title),
-                    review_content = VALUES(review_content),
-                    rating = VALUES(rating),
-                    sentiment_score = VALUES(sentiment_score),
-                    sentiment_label = VALUES(sentiment_label),
-                    review_length = VALUES(review_length)
-            """
-
-            cursor.execute(
-                review_sql,
-                (
-                    review_id,
-                    product_id,
-                    user_id,
-                    review_title,
-                    review_content,
-                    rating_int,
-                    sentiment_score,
-                    row.get("sentiment_label"),
-                    review_length,
-                    None,  # review_date not available in CSV
-                ),
-            )
 
     conn.commit()
     cursor.close()
