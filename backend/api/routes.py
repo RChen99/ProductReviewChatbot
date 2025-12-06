@@ -28,7 +28,17 @@ def register_routes(app):
                 like_conditions.append("product_name LIKE %s")
                 params.append(f"%{word}%")
             
-            sql = f"SELECT * FROM products WHERE {' AND '.join(like_conditions)} LIMIT 20"
+            sql = f"""SELECT 
+                product_id, 
+                product_name, 
+                category, 
+                actual_price_usd,
+                discounted_price_usd,
+                discount_percentage,
+                about_product,
+                img_link,
+                product_link
+                FROM products WHERE {' AND '.join(like_conditions)} LIMIT 20"""
             cursor.execute(sql, tuple(params))
             products = cursor.fetchall()
             
@@ -57,7 +67,17 @@ def register_routes(app):
             cursor = conn.cursor(dictionary=True)
             
             cursor.execute(
-                "SELECT * FROM products WHERE product_id = %s",
+                """SELECT 
+                    product_id, 
+                    product_name, 
+                    category, 
+                    actual_price_usd,
+                    discounted_price_usd,
+                    discount_percentage,
+                    about_product,
+                    img_link,
+                    product_link
+                    FROM products WHERE product_id = %s""",
                 (product_id,)
             )
             product = cursor.fetchone()
@@ -232,10 +252,11 @@ def register_routes(app):
             cursor.execute("""
                 SELECT 
                     CASE 
-                        WHEN p.discounted_price < 100 THEN 'Under $100'
-                        WHEN p.discounted_price < 500 THEN '$100-$500'
-                        WHEN p.discounted_price < 1000 THEN '$500-$1000'
-                        ELSE 'Over $1000'
+                        WHEN p.discounted_price_usd < 50 THEN '$0-$50'
+                        WHEN p.discounted_price_usd < 150 THEN '$50-$150'
+                        WHEN p.discounted_price_usd < 300 THEN '$150-$300'
+                        WHEN p.discounted_price_usd < 500 THEN '$300-$500'
+                        ELSE '$500+'
                     END as price_range,
                     AVG(r.sentiment_score) as avg_sentiment,
                     AVG(r.rating) as avg_rating,
@@ -243,14 +264,15 @@ def register_routes(app):
                 FROM products p
                 JOIN reviews r ON p.product_id = r.product_id
                 WHERE r.sentiment_score IS NOT NULL 
-                    AND p.discounted_price IS NOT NULL
+                    AND p.discounted_price_usd IS NOT NULL
                 GROUP BY price_range
                 ORDER BY 
                     CASE price_range
-                        WHEN 'Under $100' THEN 1
-                        WHEN '$100-$500' THEN 2
-                        WHEN '$500-$1000' THEN 3
-                        ELSE 4
+                        WHEN '$0-$50' THEN 1
+                        WHEN '$50-$150' THEN 2
+                        WHEN '$150-$300' THEN 3
+                        WHEN '$300-$500' THEN 4
+                        WHEN '$500+' THEN 5
                     END
             """)
             summary_results = cursor.fetchall()
@@ -261,14 +283,16 @@ def register_routes(app):
                 price_range = summary['price_range']
                 
                 # Determine price conditions
-                if price_range == 'Under $100':
-                    price_condition = "p.discounted_price < 100"
-                elif price_range == '$100-$500':
-                    price_condition = "p.discounted_price >= 100 AND p.discounted_price < 500"
-                elif price_range == '$500-$1000':
-                    price_condition = "p.discounted_price >= 500 AND p.discounted_price < 1000"
-                else:  # Over $1000
-                    price_condition = "p.discounted_price >= 1000"
+                if price_range == '$0-$50':
+                    price_condition = "p.discounted_price_usd >= 0 AND p.discounted_price_usd < 50"
+                elif price_range == '$50-$150':
+                    price_condition = "p.discounted_price_usd >= 50 AND p.discounted_price_usd < 150"
+                elif price_range == '$150-$300':
+                    price_condition = "p.discounted_price_usd >= 150 AND p.discounted_price_usd < 300"
+                elif price_range == '$300-$500':
+                    price_condition = "p.discounted_price_usd >= 300 AND p.discounted_price_usd < 500"
+                else:  # $500+
+                    price_condition = "p.discounted_price_usd >= 500"
                 
                 # Get top 5 products in this price range
                 cursor.execute(f"""
@@ -280,7 +304,7 @@ def register_routes(app):
                     FROM products p
                     JOIN reviews r ON p.product_id = r.product_id
                     WHERE {price_condition}
-                        AND p.discounted_price IS NOT NULL
+                        AND p.discounted_price_usd IS NOT NULL
                     GROUP BY p.product_id, p.product_name
                     HAVING COUNT(r.review_id) >= 1
                     ORDER BY avg_rating DESC, review_count DESC
@@ -329,16 +353,16 @@ def register_routes(app):
                     p.product_id,
                     p.product_name,
                     p.category,
-                    p.discounted_price,
+                    p.discounted_price_usd,
                     AVG(r.rating) as avg_rating,
                     COUNT(r.review_id) as review_count,
-                    (AVG(r.rating) / NULLIF(p.discounted_price, 0)) * 1000 as value_score
+                    (AVG(r.rating) / NULLIF(p.discounted_price_usd, 0)) * 1000 as value_score
                 FROM products p
                 JOIN reviews r ON p.product_id = r.product_id
-                WHERE p.discounted_price IS NOT NULL 
-                    AND p.discounted_price > 0
+                WHERE p.discounted_price_usd IS NOT NULL
+                    AND p.discounted_price_usd > 0
                     AND r.rating IS NOT NULL
-                GROUP BY p.product_id, p.product_name, p.category, p.discounted_price
+                GROUP BY p.product_id, p.product_name, p.category, p.discounted_price_usd
                 HAVING COUNT(r.review_id) >= 1
                 ORDER BY value_score DESC, avg_rating DESC
                 LIMIT 5
@@ -348,7 +372,7 @@ def register_routes(app):
             for result in results:
                 result['avg_rating'] = float(result['avg_rating']) if result['avg_rating'] else 0.0
                 result['review_count'] = int(result['review_count']) if result['review_count'] else 0
-                result['discounted_price'] = float(result['discounted_price']) if result['discounted_price'] else 0.0
+                result['discounted_price_usd'] = float(result['discounted_price_usd']) if result['discounted_price_usd'] else 0.0
                 result['value_score'] = float(result['value_score']) if result['value_score'] else 0.0
             
             return jsonify(results), 200

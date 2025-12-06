@@ -67,15 +67,15 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
             product_sql = """
                 INSERT INTO products (
                     product_id, product_name, category,
-                    actual_price, discounted_price, discount_percentage,
+                    actual_price_usd, discounted_price_usd, discount_percentage,
                     about_product, img_link, product_link
                 )
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 ON DUPLICATE KEY UPDATE
                     product_name = VALUES(product_name),
                     category = VALUES(category),
-                    actual_price = VALUES(actual_price),
-                    discounted_price = VALUES(discounted_price),
+                    actual_price_usd = VALUES(actual_price_usd),
+                    discounted_price_usd = VALUES(discounted_price_usd),
                     discount_percentage = VALUES(discount_percentage),
                     about_product = VALUES(about_product),
                     img_link = VALUES(img_link),
@@ -96,8 +96,8 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
                     product_id,
                     row["product_name"],
                     category,
-                    _safe_float(row.get("actual_price", "")),
-                    _safe_float(row.get("discounted_price", "")),
+                    _safe_float(row.get("actual_price_usd", "")),
+                    _safe_float(row.get("discounted_price_usd", "")),
                     _safe_float(row.get("discount_percentage", "")),
                     about_product,
                     row.get("img_link"),

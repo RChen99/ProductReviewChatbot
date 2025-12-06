@@ -132,8 +132,8 @@ export default function ProductPage() {
     );
   }
 
-  const price = Number(product.discounted_price) || 0;
-  const originalPrice = Number(product.actual_price) || 0;
+  const price = Number(product.discounted_price_usd) || 0;
+  const originalPrice = Number(product.actual_price_usd) || 0;
   const discount = originalPrice > 0 ? ((originalPrice - price) / originalPrice * 100).toFixed(0) : '0';
   const savings = originalPrice - price;
   const rating = Number(product.avg_rating) || 0;

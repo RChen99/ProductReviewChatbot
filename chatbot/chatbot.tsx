@@ -368,7 +368,7 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
                   </a>
                   <br />
                   <div style={{ marginLeft: '16px' }}>
-                    Price: ${item.discounted_price?.toFixed(2) || '0.00'}
+                    Price: ${item.discounted_price_usd?.toFixed(2) || '0.00'}
                     <br />
                     Rating: {item.avg_rating?.toFixed(1) || '0.0'} stars
                     <br />
@@ -724,7 +724,7 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
             }
           } else {
             const productName = currentProduct.product_name || 'this product';
-            const productPrice = currentProduct.discounted_price || 0;
+            const productPrice = currentProduct.discounted_price_usd || 0;
             const productRating = currentProduct.avg_rating || 0;
             const botMessage = {
               id: botMessageId,

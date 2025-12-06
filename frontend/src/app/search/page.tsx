@@ -95,8 +95,8 @@ export default function SearchPage() {
         <div className="search-results-grid" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {products.map((product, index) => {
             let discountPercent = undefined;
-            const actualPrice = Number(product.actual_price) || 0;
-            const discountedPrice = Number(product.discounted_price) || 0;
+            const actualPrice = Number(product.actual_price_usd) || 0;
+            const discountedPrice = Number(product.discounted_price_usd) || 0;
             
             if (product.discount_percentage) {
               discountPercent = `${Math.round(Number(product.discount_percentage))}% OFF`;

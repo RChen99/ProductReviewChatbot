@@ -1,4 +1,4 @@
-dDROP DATABASE IF EXISTS final_project_db;
+DROP DATABASE IF EXISTS final_project_db;
 CREATE DATABASE final_project_db;
 USE final_project_db;
 
@@ -6,8 +6,8 @@ CREATE TABLE products (
     product_id VARCHAR(50) PRIMARY KEY,
     product_name TEXT NOT NULL,
     category TEXT,
-    actual_price DECIMAL(10,2),
-    discounted_price DECIMAL(10,2),
+    actual_price_usd DECIMAL(10,2),
+    discounted_price_usd DECIMAL(10,2),
     discount_percentage DECIMAL(5,2),
     about_product TEXT,
     img_link TEXT,

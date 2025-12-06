@@ -4,8 +4,8 @@ export interface Product {
   product_id: string;
   product_name: string;
   category: string;
-  actual_price: number;
-  discounted_price: number;
+  actual_price_usd: number;
+  discounted_price_usd: number;
   discount_percentage: number;
   about_product: string;
   img_link: string;
