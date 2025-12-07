@@ -120,9 +120,10 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
 
             # Get product-level rating (used for all reviews if individual ratings not available)
             rating_value = _safe_float(row.get("rating", ""))
-            rating_int: Optional[int] = None
+            # Keep the actual decimal rating value, clamped between 1.0 and 5.0
+            rating_float: Optional[float] = None
             if rating_value is not None:
-                rating_int = max(1, min(5, int(round(rating_value))))
+                rating_float = max(1.0, min(5.0, float(rating_value)))
 
             # Process each review
             num_reviews = len(review_ids)
@@ -186,7 +187,7 @@ def run_etl(csv_path: str = CSV_PATH_DEFAULT) -> None:
                         user_id,
                         review_title,
                         review_content,
-                        rating_int,
+                        rating_float,
                         sentiment_score,
                         row.get("sentiment_label"),
                         review_length,
