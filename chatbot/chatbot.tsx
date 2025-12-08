@@ -266,7 +266,9 @@ export function ChatbotStandalone({ currentProduct = null, onSearchProduct }: Ch
                   <strong>{cat}:</strong>
                   <br />
                   <div style={{ marginLeft: '16px', marginTop: '4px' }}>
-                    Highest in {cat}: {item.avg_rating?.toFixed(1) || '0.0'}
+                    Highest in {cat}: {item.top_products && item.top_products.length > 0 
+                      ? item.top_products[0].avg_rating?.toFixed(1) || '0.0'
+                      : item.avg_rating?.toFixed(1) || '0.0'}
                   </div>
                   {item.top_products && item.top_products.length > 0 ? (
                     item.top_products.map((product: any, index: number) => {
