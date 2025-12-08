@@ -25,7 +25,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   } catch (error) {
     console.error('Error searching products:', error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Cannot connect to server. Make sure the backend is running on port 5000.');
+      throw new Error('Cannot connect to server. Make sure the backend is running on port 5001.');
     }
     throw error;
   }
@@ -42,7 +42,7 @@ export async function getProductById(productId: string): Promise<Product> {
   } catch (error) {
     console.error('Error fetching product:', error);
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Cannot connect to server. Make sure the backend is running on port 5000.');
+      throw new Error('Cannot connect to server. Make sure the backend is running on port 5001.');
     }
     throw error;
   }

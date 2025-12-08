@@ -50,17 +50,35 @@ DB_NAME=final_project_db
 ```
 ### Install dependencies
 
-**Backend:**
+**Backend (Python):**
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
-**Frontend:**
+This installs:
+- Flask (web framework)
+- flask-cors (CORS support)
+- mysql-connector-python (MySQL database connector)
+- python-dotenv (environment variable management)
+
+**Verify installation:** You should see all packages installed successfully. If you get errors, make sure you're using Python 3.x and pip is up to date:
+```bash
+python --version  # Should be 3.x
+pip --version
+```
+
+**Frontend (Node.js/npm):**
 ```bash
 cd frontend
 npm install
 ```
+
+This installs all React dependencies, Vite, and other frontend packages listed in `package.json`.
+
+**Verify installation:** You should see `node_modules/` folder created in the `frontend/` directory. If you get errors:
+- Make sure Node.js and npm are installed: `node --version` and `npm --version`
+- Try deleting `node_modules/` and `package-lock.json`, then run `npm install` again
 
 ## Running the Application
 
@@ -84,6 +102,29 @@ npm run dev
 ```
 
 Once both are running, you're good to go! The app will be at http://localhost:3000.
+
+### ⚠️ Important: Port Configuration & CORS
+
+**The backend MUST run on port 5001** (not 5000). The CORS configuration is set up to allow requests from:
+- `http://localhost:3000` (default Vite dev server)
+- `http://localhost:5173` (alternative Vite port)
+
+**If you change ports, you MUST update the CORS configuration:**
+
+1. **Backend port**: Edit `backend/api/__init__.py` line 6 to add your frontend URL:
+   ```python
+   CORS(app, origins=["http://localhost:3000", "http://localhost:5173", "http://localhost:YOUR_PORT"])
+   ```
+
+2. **Frontend API URL**: Edit `frontend/src/services/api.ts` line 1 if you change the backend port:
+   ```typescript
+   const API_BASE_URL = 'http://localhost:YOUR_BACKEND_PORT/api';
+   ```
+
+**Common CORS Error**: If you see "CORS policy" errors in the browser console, make sure:
+- Backend is running on port **5001** (check the terminal output)
+- Frontend is running on port **3000** or **5173** (or update CORS config)
+- Both servers are running before you try to use the app
 
 ## API endpoints
 
