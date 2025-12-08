@@ -2,10 +2,15 @@ from api import create_app
 
 if __name__ == '__main__':
     app = create_app()
-    print('Starting Flask server on http://localhost:5001')
+    PORT = 5001
+    print('=' * 60)
+    print(f'Starting Flask server on http://localhost:{PORT}')
+    print(f'Server will run on PORT: {PORT}')
+    print('=' * 60)
     print('API endpoints available at:')
     print('  - GET /api/health')
     print('  - GET /api/products/search?q=<query>')
     print('  - GET /api/products/<product_id>')
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    print('=' * 60)
+    app.run(debug=True, port=PORT, host='0.0.0.0')
 
