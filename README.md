@@ -29,7 +29,7 @@ A web app for analyzing Amazon product reviews. You can search products, read re
 
 3. **Frontend**: React chatbot that:
    - Calls the right API endpoint
-   - Shows results in formatted tables using SQL queries
+   - Shows results in formatted tables
 
 4. **Database**: [View ERD](docs/ERD.pdf) - Three tables (products, users, reviews) with relationships between them.
 
@@ -174,7 +174,7 @@ The chatbot can answer 8 types of questions:
 
 ### Example Analysis: Sentiment vs Rating Comparison
 
-![Sentiment vs Rating Comparison](docs/sentiment_rating_comparison.png)
+![Sentiment vs Rating Comparison](images/sentiment_rating.png)
 
 **Results:**
 - Weak positive correlation between sentiment score and rating
@@ -185,6 +185,11 @@ The chatbot can answer 8 types of questions:
 - Ratings don't always express true customer feelings. Sentiment captures more emotional details.
 - "Underrated" products: positive sentiment but low ratings (e.g., good experience but lowered rating due to price/delivery)
 - "Overrated" products: high ratings but not positive enough reviews
+
+## Our website demos
+![demo1](images/demo1.png)
+![demo2](images/demo2.png)
+![demo3](images/demo3.png)
 
 ---
 
