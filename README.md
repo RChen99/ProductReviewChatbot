@@ -21,6 +21,18 @@ A web app for analyzing Amazon product reviews. You can search products, read re
 **Backend**: Flask (Python), MySQL  
 **Frontend**: React + TypeScript, Vite, Tailwind CSS
 
+## Approach/Methodology
+
+1. **Data Processing**: Load Amazon reviews from CSV into MySQL database. Use VADER model to calculate sentiment scores for each review.
+
+2. **Backend**: Flask API with 8 endpoints. Each endpoint runs SQL queries to answer different analytical questions (e.g., top products, best value, sentiment analysis).
+
+3. **Frontend**: React chatbot that:
+   - Calls the right API endpoint
+   - Shows results in formatted tables using SQL queries
+
+4. **Database**: [View ERD](docs/ERD.pdf) - Three tables (products, users, reviews) with relationships between them.
+
 ## Prerequisites
 
 - Python 3.x
@@ -146,6 +158,33 @@ The backend runs on port 5001. Here's what's available:
 - `/api/analytics/rating-variance`
 - `/api/analytics/sentiment-rating-comparison`
 
+## Results, Outputs, or Demos
+
+The chatbot can answer 8 types of questions:
+1. Top-rated products by category
+2. Sentiment analysis by price range
+3. Best value products
+4. Review length vs rating
+5. Sentiment by category
+6. Discount impact on reviews
+7. Rating consistency
+8. Sentiment vs rating comparison
+
+**Outputs**: MySQL database, 8 API endpoints, React chatbot interface.
+
+### Example Analysis: Sentiment vs Rating Comparison
+
+![Sentiment vs Rating Comparison](docs/sentiment_rating_comparison.png)
+
+**Results:**
+- Weak positive correlation between sentiment score and rating
+- High sentiment scores concentrated in 0.75-1.0 range
+- Some outliers: products with high ratings (4.3+) but low/negative sentiment scores
+
+**Insights:**
+- Ratings don't always express true customer feelings. Sentiment captures more emotional details.
+- "Underrated" products: positive sentiment but low ratings (e.g., good experience but lowered rating due to price/delivery)
+- "Overrated" products: high ratings but not positive enough reviews
 
 ---
 
